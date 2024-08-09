@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, url_for, redirect
 import pickle
 import numpy as np
 import os
@@ -70,6 +70,40 @@ def index():
                 error = "Error occurred during prediction."
     
     return render_template('index.html', result=result, error=error)
+
+@app.route('/saving-locks-dashboard')
+def saving_locks_dashboard():
+    return render_template('saving-locks-dashboard.html')
+
+@app.route('/expenses-tracker')
+def expenses_tracker():
+    return render_template('expenses-tracker.html')
+
+@app.route('/setup-form')
+def setup_form():
+    return render_template('saving-locks-setup-form.html')
+
+@app.route('/process-setup', methods=['POST'])
+def process_setup():
+    if request.method == 'POST':
+        goal = float(request.form['goal'])
+        amount = float(request.form['amount'])
+        period = float(request.form['period'])
+        duration = int(request.form['duration'])
+        
+        # Here you would typically save this data to a database
+        # For now, we'll just pass it as URL parameters
+        return redirect(url_for('saving_locks_dashboard', 
+                                goal=goal, 
+                                amount=amount, 
+                                period=period, 
+                                duration=duration))
+
+@app.route('/link-to-bank')
+def link_to_bank():
+    # This route will redirect to the saving locks dashboard
+    # In a real application, you would handle bank linking logic here
+    return redirect(url_for('saving_locks_dashboard'))
 
 if __name__ == '__main__':
     app.run(debug=True)
