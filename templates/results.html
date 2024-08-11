@@ -3,29 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Prediction Results</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>Card's Operations - AI Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <style>
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .button-container .button {
+            width: 48%;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Savings Prediction Results</h1>
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Your Input</h5>
-                <p>Monthly Expenses: ${{ monthly_payment }}</p>
-                <p>Total Monthly Income: ${{ total_income }}</p>
-                <p>Savings Goal: ${{ savings_goal }}</p>
+    <div class="card">
+        <div class="card-header">
+            <h1>Card's Operations</h1>
+        </div>
+        <div class="card-body">
+            <h2>AI Recommendation</h2>
+            <p>Based on our algorithm, we recommend that you save ${{ "%.2f"|format(result.predicted_savings) }}</p>
+            <p>For the next {{ result.months_to_goal }} months</p>
+            <p>This is {{ "%.2f"|format(result.savings_percentage) }}% of your salary.</p>
+            <p>Following this suggestion will help you achieve your saving goal on time.</p>
+            
+            <div class="button-container">
+                <button class="button" onclick="acceptSuggestion()">Accept Suggestion</button>
+                <button class="button" onclick="declineSuggestion()">Decline Suggestion</button>
             </div>
         </div>
-        <div class="card mt-4">
-            <div class="card-body">
-                <h5 class="card-title">Prediction</h5>
-                <p>Recommended Monthly Savings: ${{ predicted_savings|round(2) }}</p>
-                <p>Savings Percentage of Income: {{ savings_percentage|round(2) }}%</p>
-                <p>Months to Reach Goal: {{ months_to_goal }}</p>
-            </div>
-        </div>
-        <a href="/" class="btn btn-primary mt-4">Calculate Again</a>
     </div>
+
+    <script>
+        function acceptSuggestion() {
+            alert('Suggestion accepted! (Further processing would happen here in a real application)');
+            window.location.href = "{{ url_for('saving_locks_dashboard') }}";
+        }
+
+        function declineSuggestion() {
+            if (confirm('Are you sure you want to decline this suggestion?')) {
+                window.location.href = "{{ url_for('index') }}";
+            }
+        }
+    </script>
 </body>
 </html>
