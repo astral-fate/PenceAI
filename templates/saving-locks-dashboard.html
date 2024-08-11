@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saving Locks UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='saving.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2 id="header-title">Card's Operations</h2>
+        </div>
+        <div class="tabs operation-tabs">
+            <button class="tab active" onclick="switchTab('saving-locks-dashboard')">Saving Locks</button>
+            <button class="tab" onclick="switchTab('expenses-tracker')">Expenses Tracker</button>
+        </div>
+
+        <div class="content">
+            <div class="saving-info">
+                <h3>Saving Locks</h3>
+                <div class="amount">$3,500</div>
+                <div>Goal: $10,000 | 180 days left</div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 35%;"></div>
+                </div>
+                <div>35% saved</div>
+            </div>
+            <div class="tabs content-tabs">
+                <button class="tab active" data-tab="overview">Overview</button>
+                <button class="tab" data-tab="transactions">Transactions</button>
+                <button class="tab" data-tab="settings">Settings</button>
+            </div>
+            <div id="overview" class="tab-content active">
+                <!-- Overview content will be populated by JavaScript -->
+            </div>
+            <div id="transactions" class="tab-content">
+                <!-- Transactions content will be populated by JavaScript -->
+            </div>
+            <div id="settings" class="tab-content">
+                <!-- Settings content will be populated by JavaScript -->
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="btn btn-outline">Withdraw Money</button>
+            <button class="btn btn-primary">Transfer money →</button>
+        </div>
+    </div>
+
+    <script>
+        // Data for the tabs
+        const overviewData = [
+            { date: 'May 15, 2024', amount: 1500 },
+            { date: 'Jun 15, 2024', amount: 1500 },
+            { date: 'Jul 15, 2024', amount: 1500 },
+            { date: 'Aug 15, 2024', amount: 1500 },
+            { date: 'Sep 15, 2024', amount: 1500 }
+        ];
+
+        const transactionsData = [
+            { date: '2024/04/15', amount: 1500 },
+            { date: '2024/03/15', amount: 1000 },
+            { date: '2024/02/15', amount: 500 },
+            { date: '2024/01/15', amount: 500 },
+            { date: '2023/12/15', amount: 0 }
+        ];
+
+        const settingsData = {
+            savingMethod: '$1,500 per month',
+            lockDuration: '6 months',
+            savingGoal: '$10,000'
+        };
+
+        // Function to populate tab content
+        function populateTabContent(tabId, data) {
+            const tabContent = document.getElementById(tabId);
+            tabContent.innerHTML = ''; // Clear existing content
+
+            if (tabId === 'overview') {
+                data.forEach(item => {
+                    tabContent.innerHTML += `
+                        <div class="lock-item">
+                            <div>
+                                <div style="color: #666;">Next Lock</div>
+                                <div><strong>$${item.amount} On ${item.date}</strong></div>
+                            </div>
+                            <div>🔒</div>
+                        </div>
+                    `;
+                });
+            } else if (tabId === 'transactions') {
+                data.forEach(item => {
+                    tabContent.innerHTML += `
+                        <div class="transaction-item">
+                            <div>
+                                <div><strong>Deposit</strong></div>
+                                <div style="color: #666;">${item.date}</div>
+                            </div>
+                            <div><strong>$${item.amount}</strong></div>
+                        </div>
+                    `;
+                });
+            } else if (tabId === 'settings') {
+                for (const [key, value] of Object.entries(data)) {
+                    tabContent.innerHTML += `
+                        <div class="setting-item">
+                            <div class="setting-label">${key.replace(/([A-Z])/g, ' $1').trim()}</div>
+                            <div class="setting-value">${value}</div>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Populate initial content
+        populateTabContent('overview', overviewData);
+        populateTabContent('transactions', transactionsData);
+        populateTabContent('settings', settingsData);
+
+        // Operation tabs switching functionality
+        const operationTabs = document.querySelectorAll('.operation-tabs .tab');
+        operationTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                operationTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        // Content tabs switching functionality
+        const contentTabs = document.querySelectorAll('.content-tabs .tab');
+        contentTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tabId).classList.add('active');
+                contentTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+            });
+        });
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const headerTitle = document.getElementById('header-title');
+            if (tab === 'saving-locks-dashboard') {
+                headerTitle.textContent = "Saving Locks";
+                // No need to redirect, we're already on this page
+            } else if (tab === 'expenses-tracker') {
+                headerTitle.textContent = "Expenses Tracker";
+                // Redirect to the Expenses Tracker page using Flask's url_for
+                window.location.href = "{{ url_for('expenses_tracker') }}";
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Any initialization code can go here
+        });
+    </script>
+</body>
+</html>
