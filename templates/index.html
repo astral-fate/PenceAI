@@ -5,6 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Card's Operations - Saving Locks</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+    <style>
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .button-container .button {
+            width: 48%;
+        }
+        .error-message {
+            color: red;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="card">
@@ -12,55 +27,51 @@
             <h1>Card's Operations</h1>
         </div>
         <div class="card-body">
-            <div id="step1">
-                <p class="question">How do you want to set your saving goal?</p>
-                <button class="button" onclick="setGoalMethod('self')">Set My goal By Myself</button>
-                <button class="button" onclick="setGoalMethod('ai')">Get AI assistance with for goal</button>
-            </div>
-            
-            <div id="step2" class="hidden">
-                <p class="question">What is your source of income?</p>
-                <button class="button" onclick="setIncomeSource('freelancer')">Freelancer</button>
-                <button class="button" onclick="setIncomeSource('daycheck')">Daycheck</button>
-            </div>
-            
-            <div id="step3" class="hidden">
-                <form action="{{ url_for('index') }}" method="post">
-                    <div class="input-group">
-                        <label for="monthly_payment">What is your monthly average expenses?</label>
-                        <input type="number" id="monthly_payment" name="monthly_payment" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="total_income">What is your total monthly income?</label>
-                        <input type="number" id="total_income" name="total_income" required>
-                    </div>
-                    <div class="input-group">
-                        <label for="savings_goal">How much do you want to save?</label>
-                        <input type="number" id="savings_goal" name="savings_goal" required>
-                    </div>
-                    <button type="submit" class="button">Get AI Recommendation</button>
-                </form>
-            </div>
-            {% if result %}
-            <div id="recommendation">
+            {% if not result %}
+                <div id="step1">
+                    <p class="question">How do you want to set your saving goal?</p>
+                    <button class="button" onclick="setGoalMethod('self')">Set My goal By Myself</button>
+                    <button class="button" onclick="setGoalMethod('ai')">Get AI assistance with for goal</button>
+                </div>
+                
+                <div id="step2" class="hidden">
+                    <p class="question">What is your source of income?</p>
+                    <button class="button" onclick="setIncomeSource('freelancer')">Freelancer</button>
+                    <button class="button" onclick="setIncomeSource('daycheck')">Daycheck</button>
+                </div>
+                
+                <div id="step3" class="hidden">
+                    <form id="savingsForm" action="{{ url_for('index') }}" method="post" onsubmit="return validateForm()">
+                        <div class="input-group">
+                            <label for="monthly_payment">What is your monthly average expenses?</label>
+                            <input type="number" id="monthly_payment" name="monthly_payment" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="total_income">What is your total monthly income?</label>
+                            <input type="number" id="total_income" name="total_income" required>
+                        </div>
+                        <div class="input-group">
+                            <label for="savings_goal">How much do you want to save?</label>
+                            <input type="number" id="savings_goal" name="savings_goal" required>
+                        </div>
+                        <div class="error-message" id="error-message">
+                            Your monthly expenses cannot be higher than your monthly income.
+                        </div>
+                        <button type="submit" class="button">Get AI Recommendation</button>
+                    </form>
+                </div>
+            {% else %}
                 <h2>AI Recommendation</h2>
                 <p>Based on our algorithm, we recommend that you save ${{ "%.2f"|format(result.predicted_savings) }}</p>
                 <p>For the next {{ result.months_to_goal }} months</p>
                 <p>This is {{ "%.2f"|format(result.savings_percentage) }}% of your salary.</p>
                 <p>Following this suggestion will help you achieve your saving goal on time.</p>
-                <button onclick="location.href='{{ url_for('index') }}'" class="button">Calculate Again</button>
-            </div>
+                
+                <div class="button-container">
+                    <button class="button" onclick="acceptSuggestion()">Accept Suggestion</button>
+                    <button class="button" onclick="declineSuggestion()">Decline Suggestion</button>
+                </div>
             {% endif %}
-        </div>
-
-        <div id="recommendation" class="hidden">
-            <p class="question">Based on our algorithm, we recommend that you save</p>
-            <p id="recommendedAmount" style="font-size: 24px; font-weight: bold; text-align: center;"></p>
-            <p style="text-align: center;">For the next <span id="recommendedPeriod"></span> months</p>
-            <p style="text-align: center;">This is <span id="recommendedPercentage"></span>% of your salary.</p>
-            <p>Following this suggestion will help you achieve your saving goal on time.</p>
-            <button class="button" onclick="acceptSuggestion()">Accept Suggestion</button>
-            <button class="button" onclick="showStep('step3')">Decline Suggestion</button>
         </div>
     </div>
 
@@ -82,9 +93,29 @@
             showStep('step3');
         }
 
+        function validateForm() {
+            const monthlyPayment = parseFloat(document.getElementById('monthly_payment').value);
+            const totalIncome = parseFloat(document.getElementById('total_income').value);
+            const errorMessage = document.getElementById('error-message');
+
+            if (monthlyPayment > totalIncome) {
+                errorMessage.style.display = 'block';
+                return false;
+            } else {
+                errorMessage.style.display = 'none';
+                return true;
+            }
+        }
+
         function acceptSuggestion() {
             alert('Suggestion accepted! (Further processing would happen here in a real application)');
-            showStep('step1');
+            window.location.href = "{{ url_for('saving_locks_dashboard') }}";
+        }
+
+        function declineSuggestion() {
+            if (confirm('Are you sure you want to decline this suggestion?')) {
+                window.location.href = "{{ url_for('index') }}";
+            }
         }
     </script>
 </body>
