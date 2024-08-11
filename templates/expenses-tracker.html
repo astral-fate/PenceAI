@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Improved Expenses Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Card's Operations</h2>
+        </div>
+        <div class="tabs">
+            <div class="tab" onclick="switchTab('saving-locks-dashboard')">Saving Locks</div>
+            <div class="tab active" onclick="switchTab('expensesTracker')">Expenses Tracker</div>
+        </div>
+
+        <div class="content">
+            <div class="balance-card">
+                <div>Balance</div>
+                <div class="balance">$3,420</div>
+            </div>
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon">🍷</div>
+                    <div class="feature-title">Guilty Pleasure</div>
+                    <div class="feature-description">Save an amount of your paycheck each payday</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <div class="feature-title">Spend Less</div>
+                    <div class="feature-description">Save an amount of your paycheck each payday</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📅</div>
+                    <div class="feature-title">Subscriptions</div>
+                    <div class="feature-description">Manage subscriptions through a budget</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">Cash Back</div>
+                    <div class="feature-description">Manage cashbacks through a budget</div>
+                </div>
+            </div>
+            <div class="transactions">
+                <h3>Transactions</h3>
+                <div class="transaction-months">
+                    <div class="month active">Jan</div>
+                    <div class="month">Feb</div>
+                    <div class="month">Mar</div>
+                    <div class="month">Apr</div>
+                    <div class="month">May</div>
+                    <div class="month">Jun</div>
+                    <div class="month">Jul</div>
+                </div>
+                <div class="transaction-list">
+                    <!-- Transactions will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const transactions = [
+            { type: 'Withdraw', date: '2024/12/12', amount: -120 },
+            { type: 'Deposit', date: '2024/11/12', amount: 600 },
+            { type: 'Purchase', date: '2024/11/12', amount: -1500 }
+        ];
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tab === 'saving-locks-dashboard') {
+                window.location.href = "{{ url_for('saving_locks_dashboard') }}";
+            } else if (tab === 'expensesTracker') {
+                // We're already on the Expenses Tracker page, so no action needed
+                console.log('Expenses Tracker tab clicked');
+            }
+        }
+
+        function populateTransactions() {
+            const transactionList = document.querySelector('.transaction-list');
+            transactionList.innerHTML = '';
+            transactions.forEach(transaction => {
+                const item = document.createElement('div');
+                item.className = 'transaction-item';
+                item.innerHTML = `
+                    <div>
+                        <div class="transaction-type">${transaction.type}</div>
+                        <div class="transaction-date">${transaction.date}</div>
+                    </div>
+                    <div class="transaction-amount ${transaction.amount > 0 ? 'positive' : 'negative'}">
+                        $${Math.abs(transaction.amount)}
+                    </div>
+                `;
+                transactionList.appendChild(item);
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTransactions();
+
+            // Add click events to months
+            document.querySelectorAll('.month').forEach(month => {
+                month.addEventListener('click', (e) => {
+                    document.querySelectorAll('.month').forEach(m => m.classList.remove('active'));
+                    e.target.classList.add('active');
+                    // Here you would typically filter transactions by the selected month
+                });
+            });
+
+            // Add click events to features
+            document.querySelectorAll('.feature').forEach(feature => {
+                feature.addEventListener('click', () => {
+                    alert(`${feature.querySelector('.feature-title').textContent} feature clicked!`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
