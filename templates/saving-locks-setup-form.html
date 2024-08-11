@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saving Locks Setup</title>
+
+     <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <div id="setup-form">
+            <h1>Saving Locks</h1>
+            <p>Set aside some money each time you get paid</p>
+
+            <div class="form-group">
+                <label for="saving-goal">What are you saving for?</label>
+                <select id="saving-goal">
+                    <option value="">Select a saving goal</option>
+                    <option value="education">Education</option>
+                    <option value="housing">Housing</option>
+                    <option value="travel">Travel</option>
+                    <option value="emergency">Emergency Fund</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Set saving rule</label>
+                <div class="saving-rule">
+                    <button id="payDay" class="active">PayDay</button>
+                    <button id="freelancer">Freelancer</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="save-amount">How much do you want to save?</label>
+                <input type="number" id="save-amount" placeholder="$100">
+            </div>
+
+            <div class="form-group">
+                <label for="save-period">The Amount you want to save</label>
+                <input type="number" id="save-period" placeholder="$500">
+            </div>
+
+            <div class="form-group">
+                <label for="lock-duration">Duration</label>
+                <select id="lock-duration">
+                    <option value="3">3 months</option>
+                    <option value="6" selected>6 months</option>
+                    <option value="12">12 months</option>
+                    <option value="custom">Choose date</option>
+                </select>
+            </div>
+
+            <button class="setup-button" onclick="setupSavingLocks()">Set Up</button>
+        </div>
+
+        <div id="success-message" class="success-message">
+            <div class="success-icon">✓</div>
+            <h2>You have created your saving locks!</h2>
+            <p>Next, link your bank to start achieving your saving goal.</p>
+            <!--<button class="setup-button" onclick="linkToBank()">Link To Bank</button>-->
+            <a href="{{ url_for('link_to_bank') }}" class="button">Link to Bank</a>
+        </div>
+    </div>
+
+    <script>
+        const payDayButton = document.getElementById('payDay');
+        const freelancerButton = document.getElementById('freelancer');
+        const lockDurationSelect = document.getElementById('lock-duration');
+        const setupForm = document.getElementById('setup-form');
+        const successMessage = document.getElementById('success-message');
+
+        payDayButton.addEventListener('click', () => {
+            payDayButton.classList.add('active');
+            freelancerButton.classList.remove('active');
+        });
+
+        freelancerButton.addEventListener('click', () => {
+            freelancerButton.classList.add('active');
+            payDayButton.classList.remove('active');
+        });
+
+        lockDurationSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                // Here you could add logic to show a date picker
+                console.log('Custom date selection');
+            }
+        });
+
+        function setupSavingLocks() {
+            const goal = document.getElementById('saving-goal').value;
+            const amount = document.getElementById('save-amount').value;
+            const period = document.getElementById('save-period').value;
+            const duration = document.getElementById('lock-duration').value;
+            const savingRule = document.querySelector('.saving-rule .active').id;
+
+            // Validate form (basic validation, you might want to add more)
+            if (!goal || !amount || !period || !duration) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Here you would typically send data to a server
+            console.log('Setting up saving locks...');
+            setupForm.style.display = 'none';
+            successMessage.style.display = 'block';
+
+            // Store data in localStorage for demo purposes
+            localStorage.setItem('savingLocksData', JSON.stringify({
+                goal, amount, period, duration, savingRule
+            }));
+        }
+
+        function linkToBank() {
+            // Retrieve data from localStorage
+            const data = JSON.parse(localStorage.getItem('savingLocksData'));
+
+            // Construct query string
+            const queryString = new URLSearchParams(data).toString();
+
+            // Redirect to dashboard with data
+            window.location.href = `saving-locks-dashboard.html?${queryString}`;
+        }
+    </script>
+</body>
+</html>
